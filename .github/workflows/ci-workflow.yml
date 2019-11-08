@@ -1,0 +1,29 @@
+name: CI
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [ '2.6.3' ]
+    env: CUSTOM_RUBY_VERSION=${{ matrix.ruby }}
+    name: CI for Ruby ${{ matrix.ruby }}
+    steps:
+      - name: Show env
+        run: echo $CUSTOM_RUBY_VERSION
+      - name: Checkout master
+        uses: actions/checkout@master
+      - name: Setup ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          architecture: 'x64'
+      - name: Install bundler
+        run: gem install bundler
+      - name: Update bundler
+        run: bundle update --bundler
+      - name: Install gem bundle
+        run: bundle install
+      - name: Run tests
+        run: rake test
